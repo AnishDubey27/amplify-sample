@@ -1,23 +1,14 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
 
 function App() {
+  useEffect(() => {
+    window.location.href = "https://anishdubey27.github.io";
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://anishdubey27.github.io"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Redirecting...</h1>
+      <p>If you're not redirected, <a href="https://anishdubey27.github.io">click here</a>.</p>
     </div>
   );
 }
