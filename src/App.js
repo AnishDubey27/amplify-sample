@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Note: Install framer-motion: npm install framer-motion
 // Add to index.html: <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 function App() {
   const canvasRef = useRef(null);
+  const [explode, setExplode] = useState(false);
 
   // Black Hole Particle Effect
   useEffect(() => {
@@ -70,7 +71,21 @@ function App() {
       canvas.height = window.innerHeight;
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    // Scroll detection for explosion
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      if (scrollPosition >= documentHeight - 50) { // Trigger 50px from bottom
+        setExplode(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
@@ -108,13 +123,30 @@ function App() {
         transition={{ duration: 3, repeat: Infinity }}
       />
 
-      {/* Rotating Black Hole */}
+      {/* Exploding Black Hole */}
       <motion.div
         style={styles.blackHole}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        animate={{
+          rotate: explode ? 0 : 360,
+          scale: explode ? 2 : 1,
+          opacity: explode ? 0 : 1,
+        }}
+        transition={{
+          rotate: { duration: 20, repeat: explode ? 0 : Infinity, ease: 'linear' },
+          scale: { duration: 1, ease: 'easeOut', delay: explode ? 0 : 0 },
+          opacity: { duration: 1, delay: explode ? 0.5 : 0 },
+        }}
       >
-        <div style={styles.eventHorizon} />
+        <div style={styles.eventHorizon}>
+          {explode && (
+            <motion.div
+              style={styles.explosion}
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 3, opacity: 0 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
+            />
+          )}
+        </div>
       </motion.div>
 
       {/* Cosmic Navigation */}
@@ -134,7 +166,7 @@ function App() {
             key={i}
             style={{
               ...styles.star,
-              top: `${Math.random() * 300}vh`, // Increased for more scrollable area
+              top: `${Math.random() * 300}vh`,
               left: `${Math.random() * 100}vw`,
             }}
             animate={{
@@ -149,7 +181,7 @@ function App() {
         ))}
       </div>
 
-      {/* Additional Scrollable Content */}
+      {/* Scrollable Content */}
       <div style={styles.scrollContent}>
         <motion.div
           style={styles.section}
@@ -171,18 +203,18 @@ function App() {
 // Inline Styles
 const styles = {
   app: {
-    minHeight: '300vh', // Increased height to enable scrolling
+    minHeight: '300vh',
     background: 'linear-gradient(180deg, #0a001f 0%, #000000 100%)',
     position: 'relative',
-    overflowX: 'hidden', // Changed to allow vertical scroll
+    overflowX: 'hidden',
     fontFamily: "'Orbitron', sans-serif",
   },
   canvas: {
-    position: 'fixed', // Fixed to stay in viewport
+    position: 'fixed',
     top: 0,
     left: 0,
     zIndex: 1,
-    height: '100vh', // Keeps canvas at viewport height
+    height: '100vh',
   },
   titleContainer: {
     position: 'relative',
@@ -231,6 +263,17 @@ const styles = {
     borderRadius: '50%',
     background: 'radial-gradient(circle, #000000 40%, #ff00cc 70%, #3333ff 100%)',
     boxShadow: '0 0 40px 20px rgba(255, 0, 204, 0.3)',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  explosion: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    background: 'radial-gradient(circle, #ffffff 10%, #ff00cc 50%, transparent 70%)',
+    borderRadius: '50%',
+    top: 0,
+    left: 0,
   },
   scrollIndicator: {
     position: 'fixed',
@@ -258,7 +301,7 @@ const styles = {
   scrollContent: {
     position: 'relative',
     zIndex: 2,
-    paddingTop: '100vh', // Starts after initial viewport
+    paddingTop: '100vh',
     paddingBottom: '50vh',
     color: '#ffffff',
     textAlign: 'center',
