@@ -3,10 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 
 // Note: Install framer-motion: npm install framer-motion
 // Add to index.html: <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+// Sign up at currentsapi.services for an API key
 
 function App() {
   const canvasRef = useRef(null);
   const [explode, setExplode] = useState(false);
+  const [articles, setArticles] = useState([]);
+  const API_KEY = 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys'; // Replace with your key
 
   // Black Hole Particle Effect
   useEffect(() => {
@@ -72,21 +75,51 @@ function App() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Scroll detection for explosion
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      if (scrollPosition >= documentHeight - 50) { // Trigger 50px from bottom
+      if (scrollPosition >= documentHeight - 50) {
         setExplode(true);
       }
     };
     window.addEventListener('scroll', handleScroll);
 
+    // Fetch Articles from Currents API
+    const fetchArticles = async () => {
+      const queries = [
+        { category: 'Macroeconomic', keywords: 'inflation interest rates' },
+        { category: 'Industry/Transaction', keywords: 'merger IPO earnings' },
+        { category: 'Op-Ed', keywords: 'opinion economy policy' },
+      ];
+      const fetchedArticles = [];
+
+      for (const query of queries) {
+        try {
+          const response = await fetch(
+            `https://api.currentsapi.services/v1/search?keywords=${query.keywords}&language=en&apiKey=${API_KEY}`
+          );
+          const data = await response.json();
+          if (data.status === 'ok' && data.news.length > 0) {
+            fetchedArticles.push({
+              category: query.category,
+              title: data.news[0].title,
+              content: data.news[0].description || 'No description available.',
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching ${query.category} article:`, error);
+        }
+      }
+      setArticles(fetchedArticles);
+    };
+
+    fetchArticles();
+
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [API_KEY]);
 
   return (
     <div style={styles.app}>
@@ -181,7 +214,7 @@ function App() {
         ))}
       </div>
 
-      {/* Scrollable Content */}
+      {/* Scrollable Content with Articles */}
       <div style={styles.scrollContent}>
         <motion.div
           style={styles.section}
@@ -195,6 +228,30 @@ function App() {
             Venture deeper into the mysteries of the universe where light bends and time warps.
           </p>
         </motion.div>
+
+        {/* Articles Section */}
+        <div style={styles.articlesContainer}>
+          <h2 style={styles.articlesTitle}>Cosmic Knowledge Base</h2>
+          <p style={styles.articlesSubtitle}>Inspired by Jim Donovan’s WSJ Reading Strategy</p>
+          {articles.length > 0 ? (
+            articles.map((article, index) => (
+              <motion.div
+                key={index}
+                style={styles.articleCard}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <h3 style={styles.articleCategory}>{article.category}</h3>
+                <h4 style={styles.articleTitle}>{article.title}</h4>
+                <p style={styles.articleContent}>{article.content}</p>
+              </motion.div>
+            ))
+          ) : (
+            <p style={styles.loadingText}>Fetching cosmic insights...</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -322,6 +379,51 @@ const styles = {
     fontSize: '1.2rem',
     color: '#d1d1d1',
     textShadow: '0 0 5px rgba(255, 255, 255, 0.3)',
+  },
+  articlesContainer: {
+    maxWidth: '1000px',
+    margin: '50px auto',
+    padding: '20px',
+  },
+  articlesTitle: {
+    fontSize: '2.5rem',
+    background: 'linear-gradient(135deg, #ff00cc, #3333ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 0 15px rgba(255, 0, 204, 0.5)',
+    marginBottom: '10px',
+  },
+  articlesSubtitle: {
+    fontSize: '1.2rem',
+    color: '#d1d1d1',
+    marginBottom: '30px',
+  },
+  articleCard: {
+    background: 'rgba(10, 0, 31, 0.8)',
+    borderRadius: '10px',
+    padding: '20px',
+    marginBottom: '20px',
+    boxShadow: '0 0 20px rgba(255, 0, 204, 0.2)',
+  },
+  articleCategory: {
+    fontSize: '1.1rem',
+    color: '#ff00cc',
+    textTransform: 'uppercase',
+    marginBottom: '5px',
+  },
+  articleTitle: {
+    fontSize: '1.8rem',
+    color: '#ffffff',
+    marginBottom: '10px',
+  },
+  articleContent: {
+    fontSize: '1rem',
+    color: '#d1d1d1',
+    lineHeight: '1.5',
+  },
+  loadingText: {
+    fontSize: '1.2rem',
+    color: '#ff00cc',
   },
 };
 
