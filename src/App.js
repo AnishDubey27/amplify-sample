@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 
-// Note: Make sure to install framer-motion: npm install framer-motion
-// Add this to your index.html for the font:
-// <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+// Note: Install framer-motion: npm install framer-motion
+// Add to index.html: <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 function App() {
   const canvasRef = useRef(null);
@@ -66,7 +65,6 @@ function App() {
     }
     animate();
 
-    // Handle window resize
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -80,22 +78,22 @@ function App() {
       {/* Canvas for Black Hole Particle Effect */}
       <canvas ref={canvasRef} style={styles.canvas} />
 
-      {/* Animated Cosmic Title */}
+      {/* Fade-in Cosmic Title */}
       <motion.div
         style={styles.titleContainer}
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ duration: 2, type: 'spring' }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.5, ease: 'easeOut' }}
       >
         <h1 style={styles.title}>Cosmic Void Explorer</h1>
       </motion.div>
 
-      {/* Orbiting Subtitle */}
+      {/* Fade-in Subtitle */}
       <motion.div
         style={styles.subtitle}
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0, rotate: 360 }}
-        transition={{ delay: 1, duration: 2 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 1.5, ease: 'easeOut' }}
       >
         <p>Enter the realm of black holes and stellar wonders</p>
       </motion.div>
@@ -136,7 +134,7 @@ function App() {
             key={i}
             style={{
               ...styles.star,
-              top: `${Math.random() * 200}vh`,
+              top: `${Math.random() * 300}vh`, // Increased for more scrollable area
               left: `${Math.random() * 100}vw`,
             }}
             animate={{
@@ -150,6 +148,22 @@ function App() {
           />
         ))}
       </div>
+
+      {/* Additional Scrollable Content */}
+      <div style={styles.scrollContent}>
+        <motion.div
+          style={styles.section}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+        >
+          <h2 style={styles.sectionTitle}>The Black Hole Abyss</h2>
+          <p style={styles.sectionText}>
+            Venture deeper into the mysteries of the universe where light bends and time warps.
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -157,17 +171,18 @@ function App() {
 // Inline Styles
 const styles = {
   app: {
-    minHeight: '200vh',
+    minHeight: '300vh', // Increased height to enable scrolling
     background: 'linear-gradient(180deg, #0a001f 0%, #000000 100%)',
     position: 'relative',
-    overflow: 'hidden',
+    overflowX: 'hidden', // Changed to allow vertical scroll
     fontFamily: "'Orbitron', sans-serif",
   },
   canvas: {
-    position: 'absolute',
+    position: 'fixed', // Fixed to stay in viewport
     top: 0,
     left: 0,
     zIndex: 1,
+    height: '100vh', // Keeps canvas at viewport height
   },
   titleContainer: {
     position: 'relative',
@@ -191,7 +206,7 @@ const styles = {
     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
   },
   nebula: {
-    position: 'absolute',
+    position: 'fixed',
     width: '400px',
     height: '400px',
     background: 'radial-gradient(circle, rgba(255,0,204,0.3) 0%, rgba(51,51,255,0) 70%)',
@@ -202,7 +217,7 @@ const styles = {
     zIndex: 0,
   },
   blackHole: {
-    position: 'absolute',
+    position: 'fixed',
     width: '200px',
     height: '200px',
     top: '50%',
@@ -218,7 +233,7 @@ const styles = {
     boxShadow: '0 0 40px 20px rgba(255, 0, 204, 0.3)',
   },
   scrollIndicator: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: '10vh',
     width: '100%',
     textAlign: 'center',
@@ -239,6 +254,31 @@ const styles = {
     backgroundColor: '#ffffff',
     borderRadius: '50%',
     boxShadow: '0 0 5px rgba(255,255,255,0.8)',
+  },
+  scrollContent: {
+    position: 'relative',
+    zIndex: 2,
+    paddingTop: '100vh', // Starts after initial viewport
+    paddingBottom: '50vh',
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  section: {
+    padding: '20px',
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+  sectionTitle: {
+    fontSize: '2.5rem',
+    background: 'linear-gradient(135deg, #ff00cc, #3333ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 0 15px rgba(255, 0, 204, 0.5)',
+  },
+  sectionText: {
+    fontSize: '1.2rem',
+    color: '#d1d1d1',
+    textShadow: '0 0 5px rgba(255, 255, 255, 0.3)',
   },
 };
 
