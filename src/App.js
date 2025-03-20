@@ -3,15 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 
 // Install framer-motion: npm install framer-motion
 // Add to index.html: <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-// Set API key in Amplify env: REACT_APP_CURRENTS_API_KEY
 
 function App() {
   const canvasRef = useRef(null);
   const [explode, setExplode] = useState(false);
   const [articles, setArticles] = useState([]);
-  const API_KEY = process.env.REACT_APP_CURRENTS_API_KEY || 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys';
+  const [isUsingStatic, setIsUsingStatic] = useState(false); // Track if static articles are used
+  const API_KEY = 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys';
 
-  // Static Articles (used as fallback until API quota resets)
+  // Static Articles (used as fallback if API fails or content is too short)
   const fallbackArticles = [
     {
       category: 'Macroeconomic',
@@ -102,14 +102,93 @@ function App() {
     };
     window.addEventListener('scroll', handleScroll);
 
-    // Use static articles until API quota resets
-    setArticles(fallbackArticles);
+    const fetchArticles = async () => {
+      const queries = [
+        { category: 'Macroeconomic', keywords: 'economy' },
+        { category: 'Industry/Transaction', keywords: 'business' },
+        { category: 'Op-Ed', keywords: 'opinion' },
+      ];
+      const fetchedArticles = [];
+      let usingStatic = false;
+
+      for (const query of queries) {
+        let attempts = 0;
+        const maxAttempts = 3;
+        let success = false;
+
+        while (attempts < maxAttempts && !success) {
+          try {
+            const response = await fetch(
+              `https://api.currentsapi.services/v1/search?keywords=${query.keywords}&language=en&apiKey=${API_KEY}`
+            );
+            if (response.status === 429) {
+              throw new Error('429 Too Many Requests');
+            }
+            const data = await response.json();
+            console.log(`${query.category} response:`, data);
+            if (data.status === 'ok' && data.news?.length > 0) {
+              const article = data.news[0];
+              const description = article.description || 'No description available.';
+              // Check if description is too short (less than 50 characters)
+              if (description.length < 50) {
+                console.warn(`${query.category} - Description too short: ${description}`);
+                const fallback = fallbackArticles.find(a => a.category === query.category);
+                fetchedArticles.push(fallback);
+                usingStatic = true;
+              } else {
+                fetchedArticles.push({
+                  category: query.category,
+                  title: article.title,
+                  content: description,
+                  url: article.url || null, // Include URL for "Read More" link
+                });
+              }
+              success = true;
+            } else {
+              console.warn(`${query.category} - No articles found in response`);
+            }
+          } catch (error) {
+            console.error(`Error fetching ${query.category} article (Attempt ${attempts + 1}):`, error);
+            attempts++;
+            if (error.message === '429 Too Many Requests') {
+              fetchedArticles.push({
+                category: query.category,
+                title: 'API Quota Exceeded',
+                content: 'Oh, you’ve burned through the API quota faster than a supernova! Guess the universe isn’t ready for your cosmic curiosity—try again tomorrow, space cowboy.',
+              });
+              usingStatic = true;
+              break;
+            }
+            if (attempts === maxAttempts) {
+              console.warn(`Max attempts reached for ${query.category}. Using fallback.`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+
+        if (!success && !fetchedArticles.some(article => article.category === query.category)) {
+          const fallback = fallbackArticles.find(article => article.category === query.category);
+          fetchedArticles.push(fallback);
+          usingStatic = true;
+        }
+      }
+      setArticles(fetchedArticles);
+      setIsUsingStatic(usingStatic);
+    };
+
+    fetchArticles();
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [API_KEY]);
+
+  // Spaceship Animation Variants
+  const spaceshipVariants = {
+    initial: { y: '100vh', opacity: 0.8 },
+    animate: { y: '-100vh', opacity: 1, transition: { duration: 5, repeat: Infinity, ease: 'linear' } },
+  };
 
   return (
     <div style={styles.app}>
@@ -149,11 +228,32 @@ function App() {
           />
         ))}
       </div>
+      {/* Spaceships */}
+      <div style={styles.spaceshipContainer}>
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            style={{
+              ...styles.spaceship,
+              left: `${20 + i * 15}%`,
+              transform: `rotate(${Math.random() * 20 - 10}deg)`,
+            }}
+            variants={spaceshipVariants}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: i * 0.5 }}
+          >
+            🚀
+          </motion.div>
+        ))}
+      </div>
       <div style={styles.scrollContent}>
         <div style={styles.articlesContainer}>
           <h2 style={styles.articlesTitle}>Cosmic Knowledge Base</h2>
           <p style={styles.articlesSubtitle}>Inspired by Jim Donovan’s WSJ Reading Strategy</p>
-          <p style={styles.apiNotice}>Note: Live articles are unavailable until API quota resets tomorrow. Showing static content.</p>
+          {isUsingStatic && (
+            <p style={styles.apiNotice}>Note: Some articles are static due to API issues.</p>
+          )}
           {articles.map((article, index) => (
             <motion.div
               key={index}
@@ -166,6 +266,11 @@ function App() {
               <h3 style={styles.articleCategory}>{article.category}</h3>
               <h4 style={styles.articleTitle}>{article.title}</h4>
               <p style={styles.articleContent}>{article.content}</p>
+              {article.url && (
+                <a href={article.url} target="_blank" rel="noopener noreferrer" style={styles.readMoreLink}>
+                  Read More
+                </a>
+              )}
             </motion.div>
           ))}
         </div>
@@ -183,7 +288,9 @@ const styles = {
   explosion: { position: 'absolute', width: '100%', height: '100%', background: 'radial-gradient(circle, #ffffff 10%, #ff00cc 50%, transparent 70%)', borderRadius: '50%', top: 0, left: 0 },
   starField: { position: 'absolute', width: '100%', height: '100%', zIndex: 0 },
   star: { position: 'absolute', width: '2px', height: '2px', backgroundColor: '#ffffff', borderRadius: '50%', boxShadow: '0 0 5px rgba(255,255,255,0.8)' },
-  scrollContent: { position: 'relative', zIndex: 2, paddingTop: '100vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
+  spaceshipContainer: { position: 'fixed', width: '100%', height: '100vh', zIndex: 2 },
+  spaceship: { position: 'absolute', fontSize: '2rem', color: '#ff00cc', textShadow: '0 0 10px rgba(255, 0, 204, 0.7)' },
+  scrollContent: { position: 'relative', zIndex: 2, paddingTop: '20vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
   articlesContainer: { maxWidth: '1000px', margin: '50px auto', padding: '20px' },
   articlesTitle: { fontSize: '2.5rem', background: 'linear-gradient(135deg, #ff00cc, #3333ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: '0 0 15px rgba(255, 0, 204, 0.5)', marginBottom: '10px' },
   articlesSubtitle: { fontSize: '1.2rem', color: '#d1d1d1', marginBottom: '10px' },
@@ -191,7 +298,8 @@ const styles = {
   articleCard: { background: 'rgba(10, 0, 31, 0.8)', borderRadius: '10px', padding: '20px', marginBottom: '20px', boxShadow: '0 0 20px rgba(255, 0, 204, 0.2)' },
   articleCategory: { fontSize: '1.1rem', color: '#ff00cc', textTransform: 'uppercase', marginBottom: '5px' },
   articleTitle: { fontSize: '1.8rem', color: '#ffffff', marginBottom: '10px' },
-  articleContent: { fontSize: '1rem', color: '#d1d1d1', lineHeight: '1.5' },
+  articleContent: { fontSize: '1rem', color: '#d1d1d1', lineHeight: '1.5', marginBottom: '10px' },
+  readMoreLink: { color: '#ff00cc', textDecoration: 'underline', fontSize: '0.9rem' },
 };
 
 export default App;
