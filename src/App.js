@@ -8,7 +8,7 @@ function App() {
   const canvasRef = useRef(null);
   const [explode, setExplode] = useState(false);
   const [articles, setArticles] = useState([]);
-  const [isUsingStatic, setIsUsingStatic] = useState(false); // Track if static articles are used
+  const [isUsingStatic, setIsUsingStatic] = useState(false);
   const API_KEY = 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys';
 
   // Static Articles (used as fallback if API fails or content is too short)
@@ -129,7 +129,6 @@ function App() {
             if (data.status === 'ok' && data.news?.length > 0) {
               const article = data.news[0];
               const description = article.description || 'No description available.';
-              // Check if description is too short (less than 50 characters)
               if (description.length < 50) {
                 console.warn(`${query.category} - Description too short: ${description}`);
                 const fallback = fallbackArticles.find(a => a.category === query.category);
@@ -140,7 +139,7 @@ function App() {
                   category: query.category,
                   title: article.title,
                   content: description,
-                  url: article.url || null, // Include URL for "Read More" link
+                  url: article.url || null,
                 });
               }
               success = true;
@@ -184,12 +183,6 @@ function App() {
     };
   }, [API_KEY]);
 
-  // Spaceship Animation Variants
-  const spaceshipVariants = {
-    initial: { y: '100vh', opacity: 0.8 },
-    animate: { y: '-100vh', opacity: 1, transition: { duration: 5, repeat: Infinity, ease: 'linear' } },
-  };
-
   return (
     <div style={styles.app}>
       <canvas ref={canvasRef} style={styles.canvas} />
@@ -228,31 +221,14 @@ function App() {
           />
         ))}
       </div>
-      {/* Spaceships */}
-      <div style={styles.spaceshipContainer}>
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            style={{
-              ...styles.spaceship,
-              left: `${20 + i * 15}%`,
-              transform: `rotate(${Math.random() * 20 - 10}deg)`,
-            }}
-            variants={spaceshipVariants}
-            initial="initial"
-            animate="animate"
-            transition={{ delay: i * 0.5 }}
-          >
-            🚀
-          </motion.div>
-        ))}
-      </div>
       <div style={styles.scrollContent}>
         <div style={styles.articlesContainer}>
           <h2 style={styles.articlesTitle}>Cosmic Knowledge Base</h2>
           <p style={styles.articlesSubtitle}>Inspired by Jim Donovan’s WSJ Reading Strategy</p>
           {isUsingStatic && (
-            <p style={styles.apiNotice}>Note: Some articles are static due to API issues.</p>
+            <p style={styles.apiNotice}>
+              Warning: Our cosmic data stream got sucked into a black hole! These articles are from our emergency stasis pod—still stellar, but not fresh from the galaxy.
+            </p>
           )}
           {articles.map((article, index) => (
             <motion.div
@@ -280,7 +256,15 @@ function App() {
 }
 
 const styles = {
-  app: { minHeight: '300vh', background: 'linear-gradient(180deg, #0a001f 0%, #000000 100%)', position: 'relative', overflowX: 'hidden', fontFamily: "'Orbitron', sans-serif" },
+  app: {
+    minHeight: '300vh',
+    background: `url('https://media1.tenor.com/m/HLGlRVYVjNIAAAAd/starship-spacex.gif') no-repeat center center, linear-gradient(180deg, #0a001f 0%, #000000 100%)`,
+    backgroundSize: 'cover',
+    position: 'relative',
+    overflowX: 'hidden',
+    fontFamily: "'Orbitron', sans-serif",
+    opacity: 0.5, // Adjust opacity to blend with the cosmic background
+  },
   canvas: { position: 'fixed', top: 0, left: 0, zIndex: 1, height: '100vh' },
   nebula: { position: 'fixed', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(255,0,204,0.3) 0%, rgba(51,51,255,0) 70%)', borderRadius: '50%', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0 },
   blackHole: { position: 'fixed', width: '200px', height: '200px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 },
@@ -288,8 +272,6 @@ const styles = {
   explosion: { position: 'absolute', width: '100%', height: '100%', background: 'radial-gradient(circle, #ffffff 10%, #ff00cc 50%, transparent 70%)', borderRadius: '50%', top: 0, left: 0 },
   starField: { position: 'absolute', width: '100%', height: '100%', zIndex: 0 },
   star: { position: 'absolute', width: '2px', height: '2px', backgroundColor: '#ffffff', borderRadius: '50%', boxShadow: '0 0 5px rgba(255,255,255,0.8)' },
-  spaceshipContainer: { position: 'fixed', width: '100%', height: '100vh', zIndex: 2 },
-  spaceship: { position: 'absolute', fontSize: '2rem', color: '#ff00cc', textShadow: '0 0 10px rgba(255, 0, 204, 0.7)' },
   scrollContent: { position: 'relative', zIndex: 2, paddingTop: '20vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
   articlesContainer: { maxWidth: '1000px', margin: '50px auto', padding: '20px' },
   articlesTitle: { fontSize: '2.5rem', background: 'linear-gradient(135deg, #ff00cc, #3333ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: '0 0 15px rgba(255, 0, 204, 0.5)', marginBottom: '10px' },
