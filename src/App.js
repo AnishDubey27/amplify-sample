@@ -9,7 +9,7 @@ function App() {
   const canvasRef = useRef(null);
   const [explode, setExplode] = useState(false);
   const [articles, setArticles] = useState([]);
-  const API_KEY = process.env.REACT_APP_CURRENTS_API_KEY || 'your_key_here'; // Use env variable
+  const API_KEY = process.env.REACT_APP_CURRENTS_API_KEY || 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys'; // Use env variable
 
   useEffect(() => {
     const canvas = canvasRef.current;
