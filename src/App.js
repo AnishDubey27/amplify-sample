@@ -9,6 +9,7 @@ function App() {
   const [explode, setExplode] = useState(false);
   const [articles, setArticles] = useState([]);
   const [isUsingStatic, setIsUsingStatic] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(-10); // Start at -10 seconds
   const API_KEY = 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys';
 
   // Static Articles (used as fallback if API fails or content is too short)
@@ -29,6 +30,26 @@ function App() {
       content: 'Dr. Elena Martinez argues against 2025’s new tariffs, warning they’ll raise consumer costs and disrupt supply chains. She advocates for innovation subsidies, citing historical data showing tariffs shrink GDP growth by 0.2–0.5% in their first year.',
     },
   ];
+
+  // Timer Logic: Start at -10 seconds and count up
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedTime(prevTime => prevTime + 1);
+    }, 1000); // Update every second
+
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, []);
+
+  // Format elapsed time into hh:mm:ss, handling negative values
+  const formatTime = (seconds) => {
+    const isNegative = seconds < 0;
+    const absSeconds = Math.abs(seconds);
+    const hrs = Math.floor(absSeconds / 3600);
+    const mins = Math.floor((absSeconds % 3600) / 60);
+    const secs = absSeconds % 60;
+    const timeString = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${isNegative ? 'T-' : 'T+'} ${isNegative ? `-${timeString}` : timeString}`;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -185,6 +206,8 @@ function App() {
 
   return (
     <div style={styles.app}>
+      {/* Background GIF Layer (Fullscreen) */}
+      <div style={styles.backgroundGif} />
       <canvas ref={canvasRef} style={styles.canvas} />
       <motion.div
         style={styles.nebula}
@@ -251,6 +274,10 @@ function App() {
           ))}
         </div>
       </div>
+      {/* Timer at the Bottom */}
+      <div style={styles.timer}>
+        <span style={styles.timerText}>{formatTime(elapsedTime)}</span>
+      </div>
     </div>
   );
 }
@@ -258,19 +285,29 @@ function App() {
 const styles = {
   app: {
     minHeight: '300vh',
-    background: `url('https://media1.tenor.com/m/HLGlRVYVjNIAAAAd/starship-spacex.gif') no-repeat center center, linear-gradient(180deg, #0a001f 0%, #000000 100%)`,
-    backgroundSize: 'cover',
+    background: 'linear-gradient(180deg, #0a001f 0%, #000000 100%)',
     position: 'relative',
     overflowX: 'hidden',
     fontFamily: "'Orbitron', sans-serif",
-    opacity: 0.5, // Adjust opacity to blend with the cosmic background
+  },
+  backgroundGif: {
+    position: 'fixed',
+    top: 0, // Fullscreen: top-left corner
+    left: 0,
+    width: '100vw', // Full viewport width
+    height: '100vh', // Full viewport height
+    background: `url('https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/f19202e1-6548-49a1-8449-e9faca547934/landing-part-2.gif?t=1729176809') no-repeat center center`,
+    backgroundSize: 'cover', // Scale to cover the entire viewport
+    opacity: 0.8, // Keep opacity for visibility of other elements
+    zIndex: 0, // Behind articles, timer, and other elements
+    boxShadow: '0 0 20px rgba(255, 0, 204, 0.3)', // Subtle glow
   },
   canvas: { position: 'fixed', top: 0, left: 0, zIndex: 1, height: '100vh' },
   nebula: { position: 'fixed', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(255,0,204,0.3) 0%, rgba(51,51,255,0) 70%)', borderRadius: '50%', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0 },
   blackHole: { position: 'fixed', width: '200px', height: '200px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 },
   eventHorizon: { width: '100%', height: '100%', borderRadius: '50%', background: 'radial-gradient(circle, #000000 40%, #ff00cc 70%, #3333ff 100%)', boxShadow: '0 0 40px 20px rgba(255, 0, 204, 0.3)', position: 'relative', overflow: 'hidden' },
   explosion: { position: 'absolute', width: '100%', height: '100%', background: 'radial-gradient(circle, #ffffff 10%, #ff00cc 50%, transparent 70%)', borderRadius: '50%', top: 0, left: 0 },
-  starField: { position: 'absolute', width: '100%', height: '100%', zIndex: 0 },
+  starField: { position: 'absolute', width: '100%', height: '100%', zIndex: -1 },
   star: { position: 'absolute', width: '2px', height: '2px', backgroundColor: '#ffffff', borderRadius: '50%', boxShadow: '0 0 5px rgba(255,255,255,0.8)' },
   scrollContent: { position: 'relative', zIndex: 2, paddingTop: '20vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
   articlesContainer: { maxWidth: '1000px', margin: '50px auto', padding: '20px' },
@@ -282,6 +319,25 @@ const styles = {
   articleTitle: { fontSize: '1.8rem', color: '#ffffff', marginBottom: '10px' },
   articleContent: { fontSize: '1rem', color: '#d1d1d1', lineHeight: '1.5', marginBottom: '10px' },
   readMoreLink: { color: '#ff00cc', textDecoration: 'underline', fontSize: '0.9rem' },
+  timer: {
+    position: 'fixed',
+    bottom: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: 'rgba(10, 0, 31, 0.8)',
+    padding: '10px 20px',
+    borderRadius: '8px',
+    boxShadow: '0 0 15px rgba(255, 0, 204, 0.3)',
+    zIndex: 3,
+  },
+  timerText: {
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    background: 'linear-gradient(135deg, #ff00cc, #3333ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 0 10px rgba(255, 0, 204, 0.5)',
+  },
 };
 
 export default App;
