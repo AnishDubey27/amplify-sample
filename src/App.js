@@ -10,7 +10,9 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [isUsingStatic, setIsUsingStatic] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(-10); // Start at -10 seconds
-  const API_KEY = 'ANzLVzqk3aEvyOpNF7wNA-nrmRclYn_M946UWMF488jhcAys';
+  const API_KEY = 'NvcH5CjyAs8RLjPVrY5bRFrOwqCUo7UlcZORfmNE39qOSKtP
+
+-nrmRclYn_M946UWMF488jhcAys';
 
   // Static Articles (used as fallback if API fails or content is too short)
   const fallbackArticles = [
