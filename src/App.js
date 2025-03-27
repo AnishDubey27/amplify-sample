@@ -294,8 +294,8 @@ const styles = {
     background: 'linear-gradient(135deg, #ff00cc, #3333ff)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
-    textShadow: '0 0 5px rgba(255, 0, 204, 0.8), 0 0 10px rgba(255, 0, 204, 0.6)', // Glow effect
-    WebkitTextStroke: '1px rgba(0, 0, 0, 0)', // Black border around text
+    textShadow: '0 0 5px rgba(255, 0, 204, 0.2), 0 0 10px rgba(111, 0, 255, 0.6)', // Glow effect
+    WebkitTextStroke: '1px rgba(0, 0, 0, 0.9)', // Black border around text
     marginBottom: '10px',
   },
   articlesSubtitle: {
