@@ -231,7 +231,7 @@ function App() {
           <p style={styles.articlesSubtitle}>Inspired by Jim Donovan’s WSJ Reading Strategy</p>
           {isUsingStatic && (
             <p style={styles.apiNotice}>
-              Warning: Our cosmic data stream got sucked into a black hole! These articles are from our emergency stasis pod—still stellar, but not fresh from the galaxy.
+              Warning: Our cosmic data stream got sucked into a black hole! Some of these articles are from our emergency stasis pod—still stellar, but not all fresh from the galaxy.
             </p>
           )}
           {articles.map((article, index) => (
