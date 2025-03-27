@@ -10,9 +10,7 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [isUsingStatic, setIsUsingStatic] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(-10); // Start at -10 seconds
-  const API_KEY = 'NvcH5CjyAs8RLjPVrY5bRFrOwqCUo7UlcZORfmNE39qOSKtP
-
--nrmRclYn_M946UWMF488jhcAys';
+  const API_KEY = 'NvcH5CjyAs8RLjPVrY5bRFrOwqCUo7UlcZORfmNE39qOSKtP';
 
   // Static Articles (used as fallback if API fails or content is too short)
   const fallbackArticles = [
@@ -216,26 +214,7 @@ function App() {
         animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 3, repeat: Infinity }}
       />
-      <motion.div
-        style={styles.blackHole}
-        animate={{ rotate: explode ? 0 : 360, scale: explode ? 2 : 1, opacity: explode ? 0 : 1 }}
-        transition={{
-          rotate: { duration: 20, repeat: explode ? 0 : Infinity, ease: 'linear' },
-          scale: { duration: 1, ease: 'easeOut', delay: explode ? 0 : 0 },
-          opacity: { duration: 1, delay: explode ? 0.5 : 0 },
-        }}
-      >
-        <div style={styles.eventHorizon}>
-          {explode && (
-            <motion.div
-              style={styles.explosion}
-              initial={{ scale: 0, opacity: 1 }}
-              animate={{ scale: 3, opacity: 0 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
-            />
-          )}
-        </div>
-      </motion.div>
+        
       <div style={styles.starField}>
         {[...Array(150)].map((_, i) => (
           <motion.div
@@ -306,9 +285,6 @@ const styles = {
   },
   canvas: { position: 'fixed', top: 0, left: 0, zIndex: 1, height: '100vh' },
   nebula: { position: 'fixed', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(255,0,204,0.3) 0%, rgba(51,51,255,0) 70%)', borderRadius: '50%', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0 },
-  blackHole: { position: 'fixed', width: '200px', height: '200px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 },
-  eventHorizon: { width: '100%', height: '100%', borderRadius: '50%', background: 'radial-gradient(circle, #000000 40%, #ff00cc 70%, #3333ff 100%)', boxShadow: '0 0 40px 20px rgba(255, 0, 204, 0.3)', position: 'relative', overflow: 'hidden' },
-  explosion: { position: 'absolute', width: '100%', height: '100%', background: 'radial-gradient(circle, #ffffff 10%, #ff00cc 50%, transparent 70%)', borderRadius: '50%', top: 0, left: 0 },
   starField: { position: 'absolute', width: '100%', height: '100%', zIndex: -1 },
   star: { position: 'absolute', width: '2px', height: '2px', backgroundColor: '#ffffff', borderRadius: '50%', boxShadow: '0 0 5px rgba(255,255,255,0.8)' },
   scrollContent: { position: 'relative', zIndex: 2, paddingTop: '20vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
