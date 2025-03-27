@@ -295,7 +295,7 @@ const styles = {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     textShadow: '0 0 5px rgba(255, 0, 204, 0.8), 0 0 10px rgba(255, 0, 204, 0.6)', // Glow effect
-    WebkitTextStroke: '1px rgba(255, 255, 255, 0.8)', // White border around text
+    WebkitTextStroke: '1px rgba(0, 0, 0, 0.8)', // White border around text
     marginBottom: '10px',
   },
   articlesSubtitle: {
