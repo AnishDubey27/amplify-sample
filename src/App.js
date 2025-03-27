@@ -289,9 +289,30 @@ const styles = {
   star: { position: 'absolute', width: '2px', height: '2px', backgroundColor: '#ffffff', borderRadius: '50%', boxShadow: '0 0 5px rgba(255,255,255,0.8)' },
   scrollContent: { position: 'relative', zIndex: 2, paddingTop: '20vh', paddingBottom: '50vh', color: '#ffffff', textAlign: 'center' },
   articlesContainer: { maxWidth: '1000px', margin: '50px auto', padding: '20px' },
-  articlesTitle: { fontSize: '2.5rem', background: 'linear-gradient(135deg, #ff00cc, #3333ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: '0 0 15px rgba(255, 0, 204, 0.5)', marginBottom: '10px' },
-  articlesSubtitle: { fontSize: '1.2rem', color: '#d1d1d1', marginBottom: '10px' },
-  apiNotice: { fontSize: '1rem', color: '#ff00cc', marginBottom: '20px', fontStyle: 'italic' },
+  articlesTitle: {
+    fontSize: '2.5rem',
+    background: 'linear-gradient(135deg, #ff00cc, #3333ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 0 5px rgba(255, 0, 204, 0.8), 0 0 10px rgba(255, 0, 204, 0.6)', // Glow effect
+    WebkitTextStroke: '1px rgba(255, 255, 255, 0.8)', // White border around text
+    marginBottom: '10px',
+  },
+  articlesSubtitle: {
+    fontSize: '1.2rem',
+    color: '#d1d1d1',
+    textShadow: '0 0 3px rgba(255, 255, 255, 0.8)', // Subtle border effect
+    WebkitTextStroke: '0.5px rgba(255, 255, 255, 0.8)', // Thin white border
+    marginBottom: '10px',
+  },
+  apiNotice: {
+    fontSize: '1rem',
+    color: '#ff00cc',
+    fontStyle: 'italic',
+    textShadow: '0 0 3px rgba(255, 255, 255, 0.8)', // Subtle border effect
+    WebkitTextStroke: '0.5px rgba(255, 255, 255, 0.8)', // Thin white border
+    marginBottom: '20px',
+  },
   articleCard: { background: 'rgba(10, 0, 31, 0.8)', borderRadius: '10px', padding: '20px', marginBottom: '20px', boxShadow: '0 0 20px rgba(255, 0, 204, 0.2)' },
   articleCategory: { fontSize: '1.1rem', color: '#ff00cc', textTransform: 'uppercase', marginBottom: '5px' },
   articleTitle: { fontSize: '1.8rem', color: '#ffffff', marginBottom: '10px' },
