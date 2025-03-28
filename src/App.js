@@ -142,13 +142,15 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText,bodyText&api-key=${API_KEY}`
+            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText,bodyText&order-by=newest&page-size=10&api-key=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
 
           if (data.response && data.response.results.length > 0) {
-            const article = data.response.results[0];
+            // Pick a random article from the top 5
+            const randomIndex = Math.floor(Math.random() * data.response.results.length);
+            const article = data.response.results[randomIndex];
             const description = getShortDescription(article.fields?.bodyText || article.fields?.trailText);
 
             fetchedArticles.push({
