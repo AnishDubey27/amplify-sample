@@ -142,17 +142,19 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText&api-key=${API_KEY}`
+            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText,bodyText&api-key=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
 
           if (data.response && data.response.results.length > 0) {
             const article = data.response.results[0];
+            const description = getShortDescription(article.fields?.bodyText || article.fields?.trailText);
+
             fetchedArticles.push({
               category: query.category,
               title: article.webTitle,
-              content: article.fields?.trailText || 'No description available.',
+              content: description,
               url: article.webUrl || null,
             });
           } else {
@@ -175,6 +177,13 @@ function App() {
 
     fetchArticles();
   }, [API_KEY]);
+
+  // Function to extract a short description from the article body
+  const getShortDescription = (bodyText) => {
+    if (!bodyText) return 'No description available.';
+    const sentences = bodyText.split('. '); // Split the text into sentences
+    return sentences.slice(0, 2).join('. ') + '.'; // Return the first two sentences
+  };
 
   return (
     <div style={styles.app}>
