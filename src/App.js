@@ -16,18 +16,18 @@ function App() {
   const fallbackArticles = [
     {
       category: 'Macroeconomic',
-      title: 'Fed Signals Caution on Rate Cuts as Inflation Ticks Up in Q1 2025',
-      content: 'The Federal Reserve hinted at a slower pace of interest rate cuts in 2025, citing a modest uptick in inflation to 2.4% in February, driven by rising energy costs and supply chain pressures from new tariffs. Economists suggest this could mean only two rate cuts this year, potentially keeping the benchmark rate above 4% through mid-2025.',
+      title: 'Global Inflation Rates Show Signs of Stabilization in 2025',
+      content: 'Economists report that global inflation rates are stabilizing after years of volatility. Central banks are cautiously optimistic, with many maintaining interest rates to ensure sustained growth. Key sectors like energy and technology are driving this recovery.',
     },
     {
       category: 'Industry/Transaction',
-      title: 'Tech Giant’s $15 Billion Merger Faces Regulatory Hurdles',
-      content: 'A $15 billion merger between two cloud computing firms faces antitrust scrutiny, just as Q1 2025 earnings loom. The deal aims to bolster AI infrastructure, but delays could impact a tech sector already volatile. Meanwhile, a renewable energy IPO surged 20% on debut.',
+      title: 'AI Startups See Record Funding in Q1 2025',
+      content: 'Artificial intelligence startups have raised over $20 billion in Q1 2025, marking a record-breaking quarter. Investors are particularly interested in generative AI and automation technologies, which are expected to revolutionize industries like healthcare and finance.',
     },
     {
       category: 'Op-Ed',
-      title: 'Tariffs Won’t Fix the Economy—They’ll Fracture It',
-      content: 'Dr. Elena Martinez argues against 2025’s new tariffs, warning they’ll raise consumer costs and disrupt supply chains. She advocates for innovation subsidies, citing historical data showing tariffs shrink GDP growth by 0.2–0.5% in their first year.',
+      title: 'The Future of Work: Embracing Remote and Hybrid Models',
+      content: 'Dr. Sarah Johnson explores how remote and hybrid work models are reshaping the global workforce. She argues that companies embracing flexibility see higher productivity and employee satisfaction, but warns of challenges in maintaining company culture.',
     },
   ];
 
