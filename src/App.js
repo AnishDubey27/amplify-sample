@@ -142,7 +142,7 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://newsapi.org/v2/everything?q=${query.keywords}&sources=fox-news,the-washington-times,breitbart-news&sortBy=publishedAt&pageSize=5&apiKey=${API_KEY}`
+            `https://newsapi.org/v2/everything?q=${query.keywords}&sortBy=publishedAt&pageSize=5&apiKey=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
