@@ -142,7 +142,7 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://content.guardianapis.com/search?q=${query.keywords}&api-key=${API_KEY}`
+            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText&api-key=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
