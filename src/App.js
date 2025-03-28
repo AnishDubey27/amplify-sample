@@ -123,6 +123,13 @@ function App() {
     };
     window.addEventListener('scroll', handleScroll);
 
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchArticles = async () => {
       const queries = [
         { category: 'Macroeconomic', keywords: 'economy' },
@@ -133,75 +140,40 @@ function App() {
       let usingStatic = false;
 
       for (const query of queries) {
-        let attempts = 0;
-        const maxAttempts = 3;
-        let success = false;
+        try {
+          const response = await fetch(
+            `https://content.guardianapis.com/search?q=${query.keywords}&api-key=${API_KEY}`
+          );
+          const data = await response.json();
+          console.log(`${query.category} response:`, data);
 
-        while (attempts < maxAttempts && !success) {
-          try {
-            const response = await fetch(
-              `https://api.currentsapi.services/v1/search?keywords=${query.keywords}&language=en&apiKey=${API_KEY}`
-            );
-            if (response.status === 429) {
-              throw new Error('429 Too Many Requests');
-            }
-            const data = await response.json();
-            console.log(`${query.category} response:`, data);
-            if (data.status === 'ok' && data.news?.length > 0) {
-              const article = data.news[0];
-              const description = article.description || 'No description available.';
-              if (description.length < 50) {
-                console.warn(`${query.category} - Description too short: ${description}`);
-                const fallback = fallbackArticles.find(a => a.category === query.category);
-                fetchedArticles.push(fallback);
-                usingStatic = true;
-              } else {
-                fetchedArticles.push({
-                  category: query.category,
-                  title: article.title,
-                  content: description,
-                  url: article.url || null,
-                });
-              }
-              success = true;
-            } else {
-              console.warn(`${query.category} - No articles found in response`);
-            }
-          } catch (error) {
-            console.error(`Error fetching ${query.category} article (Attempt ${attempts + 1}):`, error);
-            attempts++;
-            if (error.message === '429 Too Many Requests') {
-              fetchedArticles.push({
-                category: query.category,
-                title: 'API Quota Exceeded',
-                content: 'Oh, you’ve burned through the API quota faster than a supernova! Guess the universe isn’t ready for your cosmic curiosity—try again tomorrow, space cowboy.',
-              });
-              usingStatic = true;
-              break;
-            }
-            if (attempts === maxAttempts) {
-              console.warn(`Max attempts reached for ${query.category}. Using fallback.`);
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000));
+          if (data.response && data.response.results.length > 0) {
+            const article = data.response.results[0];
+            fetchedArticles.push({
+              category: query.category,
+              title: article.webTitle,
+              content: article.fields?.trailText || 'No description available.',
+              url: article.webUrl || null,
+            });
+          } else {
+            console.warn(`${query.category} - No articles found in response`);
+            const fallback = fallbackArticles.find(a => a.category === query.category);
+            fetchedArticles.push(fallback);
+            usingStatic = true;
           }
-        }
-
-        if (!success && !fetchedArticles.some(article => article.category === query.category)) {
-          const fallback = fallbackArticles.find(article => article.category === query.category);
+        } catch (error) {
+          console.error(`Error fetching ${query.category} article:`, error);
+          const fallback = fallbackArticles.find(a => a.category === query.category);
           fetchedArticles.push(fallback);
           usingStatic = true;
         }
       }
+
       setArticles(fetchedArticles);
       setIsUsingStatic(usingStatic);
     };
 
     fetchArticles();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, [API_KEY]);
 
   return (
