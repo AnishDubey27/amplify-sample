@@ -142,7 +142,7 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://newsapi.org/v2/everything?q=${query.keywords}&sortBy=publishedAt&pageSize=5&apiKey=${API_KEY}`
+            `https://gnews.io/api/v4/search?q=${query.keywords}&lang=en&country=us&max=5&token=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
