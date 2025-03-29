@@ -142,21 +142,20 @@ function App() {
       for (const query of queries) {
         try {
           const response = await fetch(
-            `https://gnews.io/api/v4/search?q=${query.keywords}&lang=en&country=us&max=5&token=${API_KEY}`
+            `https://content.guardianapis.com/search?q=${query.keywords}&show-fields=trailText,bodyText&api-key=${API_KEY}`
           );
           const data = await response.json();
           console.log(`${query.category} response:`, data);
 
-          if (data.articles && data.articles.length > 0) {
-            // Pick a random article from the top 5
-            const randomIndex = Math.floor(Math.random() * data.articles.length);
-            const article = data.articles[randomIndex];
+          if (data.response && data.response.results.length > 0) {
+            const article = data.response.results[0];
+            const description = getShortDescription(article.fields?.bodyText || article.fields?.trailText);
 
             fetchedArticles.push({
               category: query.category,
-              title: article.title,
-              content: article.description || 'No description available.',
-              url: article.url || null,
+              title: article.webTitle,
+              content: description,
+              url: article.webUrl || null,
             });
           } else {
             console.warn(`${query.category} - No articles found in response`);
